@@ -1,14 +1,7 @@
 import React, { Component } from 'react';
-import {
-	Header,
-	Container,
-	Form,
-	Label,
-	Input,
-	Statistic,
-	Message,
-} from 'semantic-ui-react';
+import { Header, Container, Grid, Button, Message } from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
+import './app.css';
 
 class App extends Component {
 	constructor() {
@@ -16,10 +9,8 @@ class App extends Component {
 		this.state = {
 			patient: {
 				age: 0,
-				systolic: 0,
-				diastolic: 0,
-				weakness: 0,
-				speech: 0,
+				bp: 0,
+				tia: 0,
 				duration: 0,
 				diabetic: 0,
 			},
@@ -32,26 +23,9 @@ class App extends Component {
 				nintyDay: '3.1%',
 			},
 		};
-		this.handleInput = this.handleInput.bind(this);
-		this.warningColor = this.handleInput.bind(this);
+		this.handleScore = this.handleScore.bind(this);
 	}
-	handleInput(e) {
-		const target = e.target;
-		const name = target.name;
-		let value;
-		if (name === 'age') {
-			value = target.value >= 60 ? 1 : 0;
-		} else if (name === 'systolic') {
-			value = target.value >= 140 ? 1 : 0;
-		} else if (name === 'diastolic') {
-			value = target.value >= 90 ? 1 : 0;
-		} else if (name === 'weakness') {
-			value = target.checked ? 2 : 0;
-		} else if (name === 'speech' || name === 'diabetic') {
-			value = target.checked ? 1 : 0;
-		} else if (name === 'duration') {
-			value = target.value >= 60 ? 2 : target.value >= 10 ? 1 : 0;
-		}
+	handleScore(e, { name, value }) {
 		const patient = { ...this.state.patient, [name]: value };
 		const total = Object.values(patient).reduce((a, b) => a + b, 0);
 		let risk;
@@ -87,6 +61,7 @@ class App extends Component {
 		});
 	}
 	render() {
+		const { patient } = this.state;
 		return (
 			<div style={{ marginTop: '20px' }}>
 				<Header as="h1" textAlign="center">
@@ -101,76 +76,155 @@ class App extends Component {
 					</p>
 				</Container>
 				<br />
-				<Container>
-					<Form size="small">
-						<Form.Input
-							inline
-							label="Patient Age"
-							type="number"
-							name="age"
-							min="0"
-							onChange={this.handleInput}
-						/>
-						<Form.Field inline>
-							<Input labelPosition="right" type="text">
-								<Label basic>Systolic Blood Pressure</Label>
-								<input
-									name="systolic"
-									type="number"
-									min="0"
-									step="10"
-									onChange={this.handleInput}
-								/>
-								<Label>mmHg</Label>
-							</Input>
-						</Form.Field>
-						<Form.Field inline>
-							<Input labelPosition="right" type="text">
-								<Label basic>Diastolic Blood Pressure</Label>
-								<input
-									name="diastolic"
-									type="number"
-									min="0"
-									step="10"
-									onChange={this.handleInput}
-								/>
-								<Label>mmHg</Label>
-							</Input>
-						</Form.Field>
-						<Form.Field inline>
-							<Input labelPosition="right" type="text">
-								<Label basic>How long did the symptoms last</Label>
-								<input
+				<Grid columns={2}>
+					<Grid.Row>
+						<Grid.Column textAlign="right" verticalAlign="middle">
+							<b>Patient Age</b>
+						</Grid.Column>
+						<Grid.Column>
+							<Button.Group>
+								<Button
+									active={patient.age === 0}
+									name="age"
+									value={0}
+									onClick={this.handleScore}
+								>
+									&lt;60
+								</Button>
+								<Button.Or />
+								<Button
+									active={patient.age === 1}
+									name="age"
+									value={1}
+									onClick={this.handleScore}
+								>
+									&ge;60
+								</Button>
+							</Button.Group>
+						</Grid.Column>
+					</Grid.Row>
+					<Grid.Row>
+						<Grid.Column textAlign="right" verticalAlign="middle">
+							<b>Blood pressure &ge; 140/90 mmHg:</b>
+							<br />
+							<span>(either SBP &ge; 140 or DBP &ge; 90)</span>
+						</Grid.Column>
+						<Grid.Column>
+							<Button.Group>
+								<Button
+									active={patient.bp === 0}
+									name="bp"
+									value={0}
+									onClick={this.handleScore}
+								>
+									No
+								</Button>
+								<Button.Or />
+								<Button
+									active={patient.bp === 1}
+									name="bp"
+									value={1}
+									onClick={this.handleScore}
+								>
+									Yes
+								</Button>
+							</Button.Group>
+						</Grid.Column>
+					</Grid.Row>
+					<Grid.Row>
+						<Grid.Column textAlign="right" verticalAlign="middle">
+							<b>Clinical features of the TIA</b>
+						</Grid.Column>
+						<Grid.Column>
+							<Button.Group vertical>
+								<Button
+									active={patient.tia === 0}
+									name="tia"
+									value={0}
+									onClick={this.handleScore}
+								>
+									Other symptoms
+								</Button>
+								<Button
+									active={patient.tia === 1}
+									name="tia"
+									value={1}
+									onClick={this.handleScore}
+								>
+									Speech disturbance without weakness
+								</Button>
+								<Button
+									active={patient.tia === 2}
+									name="tia"
+									value={2}
+									onClick={this.handleScore}
+								>
+									Unilateral weakness
+								</Button>
+							</Button.Group>
+						</Grid.Column>
+					</Grid.Row>
+					<Grid.Row>
+						<Grid.Column textAlign="right" verticalAlign="middle">
+							<b>Duration of symptoms</b>
+						</Grid.Column>
+						<Grid.Column>
+							<Button.Group vertical>
+								<Button
+									active={patient.duration === 0}
 									name="duration"
-									type="number"
-									min="0"
-									onChange={this.handleInput}
-								/>
-								<Label>minutes</Label>
-							</Input>
-						</Form.Field>
-						<Form.Input
-							inline
-							label="Did the patient have unilateral weakness?"
-							name="weakness"
-							type="checkbox"
-							onChange={this.handleInput}
-						/>
-						<Form.Input
-							inline
-							label="Did the patient have any speech disturbance?"
-							name="speech"
-							type="checkbox"
-							onChange={this.handleInput}
-						/>
-						<Form.Input
-							inline
-							label="Is the patient diabetic?"
-							name="diabetic"
-							type="checkbox"
-							onChange={this.handleInput}
-						/>
-					</Form>
+									value={0}
+									onClick={this.handleScore}
+								>
+									&lt; 10 minutes
+								</Button>
+								<Button
+									active={patient.duration === 1}
+									name="duration"
+									value={1}
+									onClick={this.handleScore}
+								>
+									10-59 minutes
+								</Button>
+								<Button
+									active={patient.duration === 2}
+									name="duration"
+									value={2}
+									onClick={this.handleScore}
+								>
+									&ge; 60 minutes
+								</Button>
+							</Button.Group>
+						</Grid.Column>
+					</Grid.Row>
+					<Grid.Row>
+						<Grid.Column textAlign="right" verticalAlign="middle">
+							<b>History of diabetes</b>
+						</Grid.Column>
+						<Grid.Column>
+							<Button.Group>
+								<Button
+									active={patient.diabetic === 0}
+									name="diabetic"
+									value={0}
+									onClick={this.handleScore}
+								>
+									No
+								</Button>
+								<Button.Or />
+								<Button
+									active={patient.diabetic === 1}
+									name="diabetic"
+									value={1}
+									onClick={this.handleScore}
+								>
+									Yes
+								</Button>
+							</Button.Group>
+						</Grid.Column>
+					</Grid.Row>
+				</Grid>
+				<Container>
 					<div className="ui statistic" style={{ display: 'flex' }}>
 						<div className="value">
 							{this.state.total}
