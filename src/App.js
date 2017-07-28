@@ -71,7 +71,7 @@ class App extends Component {
 					<p>
 						This is the basic ABCD<sup>2</sup> Score calculator. It will take in
 						the age, systolic blood pressure, diastolic blood pressure, basic
-						clinical features, duration and diabetic status and return the ABCD<sub>2</sub>{' '}
+						clinical features, duration and diabetic status and return the ABCD<sup>2</sup>{' '}
 						score
 					</p>
 				</Container>
